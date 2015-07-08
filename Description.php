@@ -32,7 +32,7 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                         ]
                     ]
                 ],
-                'flush' => [
+                'reset' => [
                     'httpMethod' => 'GET',
                     'uri' => '/GabrielAPI/Account/FlushSession',
                     'description' => 'Start new booking session (Session Flush) - resets all data previously recorded in the number of session',
@@ -412,11 +412,10 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                     'responseModel' => 'getResponse',
                     'parameters' => [
                         'passengers' => [
-                            'type' => 'array',
+                            'type' => 'string',
                             'location' => 'query',
                             'required' => true,
                             'items' => [
-                                // many
                                 [
                                     'passenger_id' => [
                                         'type' => 'string',

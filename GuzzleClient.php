@@ -4,10 +4,10 @@ namespace Fruitware\GabrielApi;
 
 use Fruitware\GabrielApi\Exception\BadResponseException;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Event\BeforeEvent;
 
 /**
  * @method array getSupportedLanguages()
+ * @method array changeLanguage(array $args)
  * @method array getCountryName(array $args)
  * @method array getCityName(array $args)
  * @method array getAirlineName(array $args)
@@ -29,54 +29,28 @@ use GuzzleHttp\Event\BeforeEvent;
  */
 class GuzzleClient extends \GuzzleHttp\Command\Guzzle\GuzzleClient
 {
-    /** @var GuzzleClient  */
-    protected $client;
-
     /**
-     * @var string
-     */
-    protected $sessionId;
-
-    public function __construct(ClientInterface $client, array $config = [])
-    {
-        parent::__construct($client, new Description(), $config);
-
-        $this->client = $client;
-
-        $client->getEmitter()->on('before', function (BeforeEvent $e) use($client) {
-            if ($this->sessionId) {
-                $query = $e->getRequest()->getQuery();
-                $query->add('session_id', $this->sessionId);
-            }
-        });
-    }
-
-    /**
-     * @return string
-     */
-    public function getSessionId()
-    {
-        return $this->sessionId;
-    }
-
-    /**
+     * Authenticate and obtain a work session in B2B Portal system.
+     *
      * @param array $args
      */
     public function login(array $args = [])
     {
         $result = parent::login($args);
 
-        $this->sessionId = $result['session_id'];
+        return $result['session_id'];
     }
 
     /**
-     * @param array $args
+     * Start new booking session (Session Flush) - resets all data previously recorded in the number of session
+     *
+     * @return string
      */
-    public function flush()
+    public function reset()
     {
-        $result = parent::flush($args);
+        $result = parent::reset();
 
-        $this->sessionId = $result['session_id'];
+        return $result['session_id'];
     }
 
     /**
