@@ -35,14 +35,6 @@ use Monolog\Logger;
 
 class Example 
 {
-    // Configure Monolog
-    $logger = new Logger('gabriel_api');
-    $stream = new StreamHandler(__DIR__.'/logs/gabriel_api.log', Logger::DEBUG);
-    $output = "%extra.token%: [%datetime%] %channel%.%level_name%: %message% %context% %extra%\n";
-    $formatter = new LineFormatter($output, 'Y-m-d H:i:s');
-    $stream->setFormatter($formatter);
-    $logger->pushHandler($stream);
-
     // Init Client
     Session::setCredentials('YOUR_LOGIN', 'YOUR_PASSWORD');
     $client = new Client(['base_url' => 'https://b2b.airmoldova.md/'], new Session(), new Cache(), $logger);
