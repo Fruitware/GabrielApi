@@ -373,7 +373,7 @@ class Client extends GuzzleHttpClient
 
         if ($setPassengers !== $setNewPassengers) {
             $this->getGuzzleClient()->setPassengers([
-                'passengers' => json_encode($setNewPassengers)
+                'passengers' => $setNewPassengers
             ]);
             $this->_setCache('setPassengers', $setNewPassengers, 10);
         }

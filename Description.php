@@ -412,7 +412,7 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                     'responseModel' => 'getResponse',
                     'parameters' => [
                         'passengers' => [
-                            'type' => 'string',
+                            'type' => 'array',
                             'location' => 'query',
                             'required' => true,
                             'items' => [
