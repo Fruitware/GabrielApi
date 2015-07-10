@@ -35,9 +35,12 @@ use Monolog\Logger;
 
 class Example 
 {
-    // Init Client
+    // init Client
     Session::setCredentials('YOUR_LOGIN', 'YOUR_PASSWORD');
-    $client = new Client(['base_url' => 'https://b2b.airmoldova.md/'], new Session(), new Cache(), $logger);
+    $client = new Client(new Session(), ['base_url' => 'https://b2b.airmoldova.md/']);
+
+    // set cache, if you want (your class must implement Fruitware\GabrielApi\CacheInterface)
+    $client->setCache(new Cache());
 
     // create a log channel for guzzle requests, if you want
     $log = new Logger('gabriel_guzzle_request');
