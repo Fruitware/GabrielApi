@@ -37,15 +37,10 @@ class GuzzleClient extends \GuzzleHttp\Command\Guzzle\GuzzleClient
     protected $logger;
 
     /**
-     * @param ClientInterface      $client
-     * @param DescriptionInterface $description
-     * @param array                $config
-     * @param LoggerInterface      $logger
+     * @param LoggerInterface $logger
      */
-    public function __construct(ClientInterface $client, DescriptionInterface $description, array $config, LoggerInterface $logger = null)
+    public function setLogger(LoggerInterface $logger)
     {
-        parent::__construct($client, $description, $config);
-
         $this->logger = $logger;
     }
 
