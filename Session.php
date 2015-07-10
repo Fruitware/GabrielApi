@@ -2,7 +2,7 @@
 
 namespace Fruitware\GabrielApi;
 
-class Session
+class Session implements SessionInterface
 {
     /**
      * @var string

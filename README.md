@@ -17,14 +17,14 @@ composer require fruitware/gabriel-api
 
 ```php
 Session::setCredentials('YOUR_LOGIN', 'YOUR_PASSWORD');
-// if you already have session token, you can set it, otherwise a new session token generated automatically 
-$session = new Session('your_session_token_if_exist'); 
-$client = new Client($session, ['base_url' => 'http://b2bportal.demo.qsystems.md/']); #demo server, but with real booking :)
+// if you already have session token, you can set it, otherwise a new session token generated automatically
+// Example with the demo server, but with real booking :)
+$client = new Client(['base_url' => 'http://b2bportal.demo.qsystems.md/'], new Session(), new Cache()); 
 
-// 0. get current session token
-var_dump($client->getSession()->getToken());
+// 1. Use existing session token if you have
+$client->getSession()->setToken('6215de8e576345808664376876ec9be4');
 
-// 1. search segments
+// 2. search segments (Will generate session token, if was not existed)
 $search = new Search();
 $search
     ->setLang(SearchInterface::LANG_EN)
@@ -40,11 +40,14 @@ $search
 $segments = $client->search($search);
 var_dump($segments);
 
-// 2. set segments (option_id, option_id_back)
+// 3. get current session token
+var_dump($client->getSession()->getToken());
+
+// 4. set segments (option_id, option_id_back)
 $client->setSegment(20, 36);
 var_dump($client->getCurrentBooking());
 
-// 3. set passengers
+// 5. set passengers
 $passengersIterator = new PassengerIterator();
 $passenger = new Passenger();
 $passenger
@@ -79,14 +82,14 @@ $customer
 $client->setCustomer($customer);
 var_dump($client->getCurrentBooking());
 
-// 5. set payment type
+// 6. set payment type
 $client->setPayment(PaymentInterface::TYPE_INVOICE);
 var_dump($client->getCurrentBooking());
 
-// 6. Confirm reservation
+// 7. Confirm reservation
 $client->finalizeBooking();
 
-// 7. If you want cancel reservation
+// 8. If you want cancel reservation
 $newSessionToken = $client->reset();
 var_dump($newSessionToken); // or var_dump($client->getSession()->getToken());
 ```

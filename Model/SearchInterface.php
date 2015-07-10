@@ -4,9 +4,9 @@ namespace Fruitware\GabrielApi\Model;
 
 interface SearchInterface
 {
-    const LANG_RU = 'ru-RU';
-    const LANG_RO = 'ro-RO';
-    const LANG_EN = 'en-US';
+    const LANG_RU = 'ru';
+    const LANG_RO = 'ro';
+    const LANG_EN = 'en';
 
     /**
      * Set language ru|en|ro
