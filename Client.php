@@ -9,6 +9,7 @@ use Fruitware\GabrielApi\Model\PaymentInterface;
 use Fruitware\GabrielApi\Model\SearchInterface;
 use GuzzleHttp\Client as GuzzleHttpClient;
 use GuzzleHttp\Event\BeforeEvent;
+use Psr\Log\LoggerInterface;
 
 class Client extends GuzzleHttpClient
 {
@@ -28,6 +29,11 @@ class Client extends GuzzleHttpClient
     protected $cache;
 
     /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * @var string
      */
     protected $defaultLang = SearchInterface::LANG_RO;
@@ -36,10 +42,9 @@ class Client extends GuzzleHttpClient
      * @param array            $config
      * @param SessionInterface $session
      * @param CacheInterface   $cache
-     *
-     * @throws \Exception
+     * @param LoggerInterface  $logger
      */
-    public function __construct(array $config, SessionInterface $session, CacheInterface $cache = null)
+    public function __construct(array $config, SessionInterface $session, CacheInterface $cache = null, LoggerInterface $logger = null)
     {
         parent::__construct($config);
 
@@ -49,7 +54,8 @@ class Client extends GuzzleHttpClient
 
         $this->session = $session;
         $this->cache = $cache;
-        $this->guzzleClient = new GuzzleClient($this, new Description(), $config);
+        $this->logger = $logger;
+        $this->guzzleClient = new GuzzleClient($this, new Description(), $config, $this->logger);
 
         $this->getEmitter()->on('before', function (BeforeEvent $e) {
             if ($e->getRequest()->getPath() !== '/GabrielAPI/Account/GetTicket') {
@@ -66,6 +72,15 @@ class Client extends GuzzleHttpClient
                 }
             }
         });
+
+        if ($this->logger) {
+            $this->logger->pushProcessor(function ($record) {
+                $token = $this->getSession()->getToken();
+                $record['extra']['token'] = $token;
+
+                return $record;
+            });
+        }
     }
 
     /**
@@ -100,22 +115,28 @@ class Client extends GuzzleHttpClient
     {
         if (!$this->getSession()->getToken()) {
             try {
+                if ($this->logger) $this->logger->debug(__METHOD__.' called');
                 $token = $this->getGuzzleClient()->login([
                     'login'    => $this->getSession()->getLogin(),
                     'password' => $this->getSession()->getPassword()
                 ]);
                 $this->getSession()->setToken($token);
+                if ($this->logger) $this->logger->debug('The new session created');
             }
             catch (\Exception $ex) {
                 if ($retry) {
+                    if ($this->logger) $this->logger->info(__METHOD__.' Login failed');
                     $this->login(false);
                 }
 
+                if ($this->logger) $this->logger->warning(__METHOD__.' Login failed');
                 throw $ex;
             }
 
             $this->setCache('lang', $this->defaultLang, 10);
         }
+
+        if ($this->logger) $this->logger->info(__METHOD__.' result', ['data' => $this->getSession()->getToken()]);
 
         return $this->getSession()->getToken();
     }
@@ -129,13 +150,17 @@ class Client extends GuzzleHttpClient
      */
     public function getCities($city = null)
     {
+        if ($this->logger) $this->logger->debug(__METHOD__.' called', ['city' => $city]);
         if (is_null($city)) $city = '';
         $cacheKey = 'city_'.$city;
         $result = $this->getCache($cacheKey, false);
         if (!$result) {
-            $result = $this->getGuzzleClient()->getCityName(['city' => $city]);
+            $args = ['city' => $city];
+            $result = $this->getGuzzleClient()->getCityName($args);
             $this->setCache($cacheKey, $result, 60);
         }
+
+        if ($this->logger) $this->logger->info(__METHOD__.' result', ['data' => $result]);
 
         return $result;
     }
@@ -149,13 +174,17 @@ class Client extends GuzzleHttpClient
      */
     public function getAirlines($airline = null)
     {
+        if ($this->logger) $this->logger->debug(__METHOD__.' called', ['airline' => $airline]);
         if (is_null($airline)) $airline = '';
         $cacheKey = 'airline_'.$airline;
         $result = $this->getCache($cacheKey, false);
         if (!$result) {
-            $result = $this->getGuzzleClient()->getAirlineName(['airline' => $airline]);
+            $args = ['airline' => $airline];
+            $result = $this->getGuzzleClient()->getAirlineName($args);
             $this->setCache($cacheKey, $result, 60);
         }
+
+        if ($this->logger) $this->logger->info(__METHOD__.' result', ['data' => $result]);
 
         return $result;
     }
@@ -169,13 +198,17 @@ class Client extends GuzzleHttpClient
      */
     public function getCounties($country = null)
     {
+        if ($this->logger) $this->logger->debug(__METHOD__.' called', ['country' => $country]);
         if (is_null($country)) $country = '';
         $cacheKey = 'country_'.$country;
         $result = $this->getCache($cacheKey, false);
         if (!$result) {
-            $result = $this->getGuzzleClient()->getCountryName(['country' => $country]);
+            $args = ['country' => $country];
+            $result = $this->getGuzzleClient()->getCountryName($args);
             $this->setCache($cacheKey, $result, 60);
         }
+
+        if ($this->logger) $this->logger->info(__METHOD__.' result', ['data' => $result]);
 
         return $result;
     }
@@ -187,7 +220,12 @@ class Client extends GuzzleHttpClient
      */
     public function getCurrentBooking()
     {
-        return $this->getGuzzleClient()->getCurrentBooking();
+        if ($this->logger) $this->logger->debug(__METHOD__.' called');
+        $result = $this->getGuzzleClient()->getCurrentBooking();
+
+        if ($this->logger) $this->logger->info(__METHOD__.' result', ['data' => $result]);
+
+        return $result;
     }
 
     /**
@@ -199,9 +237,14 @@ class Client extends GuzzleHttpClient
      */
     public function search(SearchInterface $search)
     {
+        if ($this->logger) $this->logger->debug(__METHOD__.' called');
         if ($search->getLang() !== $this->getCache('lang')) {
-            $this->getGuzzleClient()->changeLanguage(['culture_code' => $search->getLang()]);
+            $args = ['culture_code' => $search->getLang()];
+            $this->getGuzzleClient()->changeLanguage($args);
             $this->setCache('lang', $search->getLang(), 10);
+        }
+        else {
+            if ($this->logger) $this->logger->debug(__METHOD__.' -> lang used from the cache');
         }
 
         $passengers = [
@@ -211,10 +254,12 @@ class Client extends GuzzleHttpClient
         ];
 
         if ($passengers !== $this->getCache('numberOfPassengers')) {
-            var_dump('numberOfPassengers');
             $this->getGuzzleClient()->setNumberOfPassengers($passengers);
             $this->setCache('numberOfPassengers', $passengers, 10);
             $this->deleteCache('getSegments');
+        }
+        else {
+            if ($this->logger) $this->logger->debug(__METHOD__.' -> numberOfPassengers used from the cache');
         }
 
         $newGetSegmentsArgs = [
@@ -227,14 +272,16 @@ class Client extends GuzzleHttpClient
 
         $getSegmentsArgs = $this->getCache('getSegmentsArgs');
         if ($newGetSegmentsArgs !== $getSegmentsArgs || !$this->getCache('getSegments')) {
-            var_dump('getSegmentsArgs');
             $getSegments = $this->getGuzzleClient()->getSegments($newGetSegmentsArgs);
-            $this->setCache('getSegmentsArgs', $newGetSegmentsArgs, 10);
-            $this->setCache('getSegments', $getSegments, 10);
+            $this->setCache('getSegmentsArgs', $newGetSegmentsArgs, 5);
+            $this->setCache('getSegments', $getSegments, 5);
         }
         else {
             $getSegments = $this->getCache('getSegments');
+            if ($this->logger) $this->logger->debug(__METHOD__.' -> getSegments used from the cache');
         }
+
+        if ($this->logger) $this->logger->info(__METHOD__.' result', ['data' => $getSegments]);
 
         return $getSegments;
     }
@@ -246,6 +293,8 @@ class Client extends GuzzleHttpClient
      */
     public function setSegment($optionId, $optionIdBack = null, $searchOption = 1)
     {
+        if ($this->logger) $this->logger->debug(__METHOD__.' called', ['optionId' => $optionId, 'optionIdBack' => $optionIdBack, 'searchOption' => $searchOption]);
+
         $setSegments = $this->getCache('setSegments');
 
         $segments = [
@@ -258,7 +307,11 @@ class Client extends GuzzleHttpClient
             $this->getGuzzleClient()->setSegment($segments);
             $this->setCache('setSegments', $segments, 10);
         }
+        else {
+            if ($this->logger) $this->logger->debug(__METHOD__.' used from the cache');
+        }
 
+        if ($this->logger) $this->logger->info(__METHOD__.' result');
     }
 
     /**
@@ -266,26 +319,20 @@ class Client extends GuzzleHttpClient
      */
     public function setCustomer(CustomerInterface $customer)
     {
-        $setCustomer = $this->getCache('setCustomer');
+        $setNewCustomer = $customer->toArray();
+        if ($this->logger) $this->logger->debug(__METHOD__.' called', ['customer' => $setNewCustomer]);
 
-        $setNewCustomer = [
-            'first_name' => $customer->getFirstName(),
-            'last_name' => $customer->getLastName(),
-            'title' => $customer->getTitle(),
-            'gender' => $customer->getGender(),
-            'birth_date' => $customer->getBirthDate()->format('Y-m-d'),
-            'Passport' => $customer->getPassport(),
-            'PassportIssued' => $customer->getPassportIssued()->format('Y-m-d'),
-            'PassportExpire' => $customer->getPassportExpire()->format('Y-m-d'),
-            'PassportCountry' => $customer->getPassportCountry(),
-            'Contact' => $customer->getPhone(),
-            'Email' => $customer->getEmail()
-        ];
+        $setCustomer = $this->getCache('setCustomer');
 
         if ($setCustomer !== $setNewCustomer) {
             $this->getGuzzleClient()->setCustomer($setNewCustomer);
             $this->setCache('setCustomer', $setNewCustomer, 10);
         }
+        else {
+            if ($this->logger) $this->logger->debug(__METHOD__.' used from the cache');
+        }
+
+        if ($this->logger) $this->logger->info(__METHOD__.' result');
     }
 
     /**
@@ -300,21 +347,10 @@ class Client extends GuzzleHttpClient
                 throw new \InvalidArgumentException('passenger must me instance of PassengerInterface');
             }
 
-            $setNewPassengers[] = [
-                'passenger_id' => $passenger->getPassengerId(),
-                'first_name' => $passenger->getFirstName(),
-                'last_name' => $passenger->getLastName(),
-                'title' => $passenger->getTitle(),
-                'gender' => $passenger->getGender(),
-                'birth_date' => $passenger->getBirthDate()->format('Y-m-d'),
-                'Passport' => $passenger->getPassport(),
-                'PassportIssued' => $passenger->getPassportIssued()->format('Y-m-d'),
-                'PassportExpire' => $passenger->getPassportExpire()->format('Y-m-d'),
-                'PassportCountry' => $passenger->getPassportCountry(),
-                'Contact' => $passenger->getPhone(),
-                'Email' => $passenger->getEmail()
-            ];
+            $setNewPassengers[] = $passenger->toArray();
         }
+
+        if ($this->logger) $this->logger->debug(__METHOD__.' called', ['passengers' => $setNewPassengers]);
 
         $setPassengers = $this->getCache('setPassengers');
 
@@ -324,6 +360,11 @@ class Client extends GuzzleHttpClient
             ]);
             $this->setCache('setPassengers', $setNewPassengers, 10);
         }
+        else {
+            if ($this->logger) $this->logger->debug(__METHOD__.' used from the cache');
+        }
+
+        if ($this->logger) $this->logger->info(__METHOD__.' result');
     }
 
     /**
@@ -333,6 +374,8 @@ class Client extends GuzzleHttpClient
      */
     public function setPayment($type)
     {
+        if ($this->logger) $this->logger->debug(__METHOD__.' called', ['type' => $type]);
+
         if (!in_array($type, [PaymentInterface::TYPE_CASH, PaymentInterface::TYPE_CREDIT_CARD, PaymentInterface::TYPE_INVOICE])) {
             throw new \InvalidArgumentException('type '.$type.' is not valid');
         }
@@ -345,6 +388,11 @@ class Client extends GuzzleHttpClient
             ]);
             $this->setCache('setPayment', $type, 10);
         }
+        else {
+            if ($this->logger) $this->logger->debug(__METHOD__.' used from the cache');
+        }
+
+        if ($this->logger) $this->logger->info(__METHOD__.' result');
     }
 
     /**
@@ -352,7 +400,11 @@ class Client extends GuzzleHttpClient
      */
     public function finalizeBooking()
     {
+        if ($this->logger) $this->logger->debug(__METHOD__.' called');
+
         $this->getGuzzleClient()->finalizeBooking();
+
+        if ($this->logger) $this->logger->info(__METHOD__.' result');
     }
 
     /**
@@ -362,7 +414,9 @@ class Client extends GuzzleHttpClient
      */
     public function reset()
     {
-        $token = $this->getGuzzleClient()->reset();
+        if ($this->logger) $this->logger->debug(__METHOD__.' called');
+
+        $newToken = $this->getGuzzleClient()->reset();
         $this->deleteCache('lang');
         $this->deleteCache('numberOfPassengers');
         $this->deleteCache('getSegmentsArgs');
@@ -372,7 +426,8 @@ class Client extends GuzzleHttpClient
         $this->deleteCache('setPassengers');
         $this->deleteCache('setPayment');
 
-        $this->getSession()->setToken($token);
+        if ($this->logger) $this->logger->info(__METHOD__.' result', ['token' => $newToken]);
+        $this->getSession()->setToken($newToken);
 
         return $this->getSession()->getToken();
     }
@@ -383,19 +438,25 @@ class Client extends GuzzleHttpClient
      * @param int    $minutes
      * @param bool   $sessionTokenPrefix
      *
-     * @return mixed|bool
+     * @return mixed|null
      */
     protected function setCache($key, $value, $minutes, $sessionTokenPrefix = true)
     {
+        if ($this->logger) $this->logger->debug(__METHOD__.' called', ['key' => $key, 'value' => $value, 'minutes' => $minutes, 'sessionTokenPrefix' => $sessionTokenPrefix]);
+
         if ($this->cache) {
             if ($sessionTokenPrefix) {
                 $key = $this->getSession()->getToken().'_'.$key;
             }
 
-            return $this->cache->set($key, $value, $minutes);
+            if ($this->logger) $this->logger->debug(__METHOD__.' set', ['key' => $key, 'value' => $value, 'minutes' => $minutes]);
+            $result = $this->cache->set($key, $value, $minutes);
+            if ($this->logger) $this->logger->debug(__METHOD__.' result', ['data' => $result]);
+
+            return $result;
         }
 
-        return false;
+        if ($this->logger) $this->logger->debug(__METHOD__.' cache not used');
     }
 
     /**
@@ -406,11 +467,21 @@ class Client extends GuzzleHttpClient
      */
     protected function getCache($key, $sessionTokenPrefix = true)
     {
+        if ($this->logger) $this->logger->debug(__METHOD__.' called', ['key' => $key, 'sessionTokenPrefix' => $sessionTokenPrefix]);
+
         if ($sessionTokenPrefix) {
             $key = $this->getSession()->getToken().'_'.$key;
         }
 
-        return $this->cache && $this->cache->get($key) ? $this->cache->get($key) : null;
+        if ($this->cache) {
+            if ($this->logger) $this->logger->debug(__METHOD__.' get', ['key' => $key]);
+            $result = $this->cache && $this->cache->get($key) ? $this->cache->get($key) : null;
+            if ($this->logger) $this->logger->debug(__METHOD__.' result', ['data' => $result]);
+
+            return $result;
+        }
+
+        if ($this->logger) $this->logger->debug(__METHOD__.' cache not used');
     }
 
     /**
@@ -426,7 +497,13 @@ class Client extends GuzzleHttpClient
         }
 
         if ($this->cache) {
-            $this->cache->delete($key);
+            if ($this->logger) $this->logger->debug(__METHOD__, ['key' => $key]);
+            $result = $this->cache->delete($key);
+            if ($this->logger) $this->logger->debug(__METHOD__.' result', ['data' => $result]);
+
+            return $result;
         }
+
+        if ($this->logger) $this->logger->debug(__METHOD__.' cache not used');
     }
 }

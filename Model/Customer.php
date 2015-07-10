@@ -59,6 +59,23 @@ class Customer implements CustomerInterface
      */
     protected $email;
 
+    public function toArray()
+    {
+        return [
+            'first_name' => $this->getFirstName(),
+            'last_name' => $this->getLastName(),
+            'title' => $this->getTitle(),
+            'gender' => $this->getGender(),
+            'birth_date' => $this->getBirthDate()->format('Y-m-d'),
+            'Passport' => $this->getPassport(),
+            'PassportIssued' => $this->getPassportIssued()->format('Y-m-d'),
+            'PassportExpire' => $this->getPassportExpire()->format('Y-m-d'),
+            'PassportCountry' => $this->getPassportCountry(),
+            'Contact' => $this->getPhone(),
+            'Email' => $this->getEmail()
+        ];
+    }
+
     /**
      * @param string $firstName
      *

@@ -4,6 +4,8 @@ namespace Fruitware\GabrielApi;
 
 use Fruitware\GabrielApi\Exception\BadResponseException;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Command\Guzzle\DescriptionInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * @method array getSupportedLanguages()
@@ -29,6 +31,24 @@ use GuzzleHttp\ClientInterface;
  */
 class GuzzleClient extends \GuzzleHttp\Command\Guzzle\GuzzleClient
 {
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
+     * @param ClientInterface      $client
+     * @param DescriptionInterface $description
+     * @param array                $config
+     * @param LoggerInterface      $logger
+     */
+    public function __construct(ClientInterface $client, DescriptionInterface $description, array $config, LoggerInterface $logger = null)
+    {
+        parent::__construct($client, $description, $config);
+
+        $this->logger = $logger;
+    }
+
     /**
      * Authenticate and obtain a work session in B2B Portal system.
      *
@@ -57,15 +77,28 @@ class GuzzleClient extends \GuzzleHttp\Command\Guzzle\GuzzleClient
      * @param string $name
      * @param array  $arguments
      *
+     * @throws \Exception
      * @return array
      */
     public function __call($name, array $arguments)
     {
-        $response = parent::__call($name, $arguments);
+        if ($this->logger) $this->logger->info(__METHOD__.' -> '.$name.' request', ['data' => $arguments]);
 
-        if ($this->checkSuccessResponse($response)) {
-            return $response['result'];
+        try {
+            $response = parent::__call($name, $arguments);
+
+            if ($this->checkSuccessResponse($response)) {
+                if ($this->logger) $this->logger->info(__METHOD__.' -> '.$name.' result', ['data' => $response['result']]);
+                return $response['result'];
+            }
         }
+        catch (\Exception $ex) {
+            if ($this->logger) $this->logger->error(__METHOD__.' -> '.$name.' result error', ['data' => $ex->getMessage(), 'file' => $ex->getFile(), 'code' => $ex->getCode(), 'line' => $ex->getLine(), 'trace' => $ex->getTraceAsString()]);
+
+            throw $ex;
+        }
+
+        if ($this->logger) $this->logger->error(__METHOD__.' -> '.$name.' result error', ['message' => $response['message'], 'code' => $response['code']]);
 
         throw new BadResponseException($response['message'], $response['code']);
     }

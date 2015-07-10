@@ -18,8 +18,7 @@ composer require fruitware/gabriel-api
 ```php
 Session::setCredentials('YOUR_LOGIN', 'YOUR_PASSWORD');
 // if you already have session token, you can set it, otherwise a new session token generated automatically
-// Example with the demo server, but with real booking :)
-$client = new Client(['base_url' => 'http://b2bportal.demo.qsystems.md/'], new Session(), new Cache()); 
+$client = new Client(['base_url' => 'https://b2b.airmoldova.md/'], new Session(), new Cache()); 
 
 // 1. Use existing session token if you have
 $client->getSession()->setToken('6215de8e576345808664376876ec9be4');

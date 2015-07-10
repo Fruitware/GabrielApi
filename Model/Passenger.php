@@ -9,6 +9,13 @@ class Passenger extends Customer implements PassengerInterface
      */
     protected $passengerId;
 
+    public function toArray()
+    {
+        return array_merge(parent::toArray(), [
+            'passenger_id' => $this->getPassengerId(),
+        ]);
+    }
+
     /**
      * @param int $passengerId
      *

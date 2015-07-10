@@ -144,4 +144,9 @@ interface CustomerInterface
      * @return string
      */
     public function getEmail();
+
+    /**
+     * @return array
+     */
+    public function toArray();
 }

@@ -11,7 +11,7 @@ interface CacheInterface
      * @param mixed  $value
      * @param int    $minutes
      *
-     * @return mixed
+     * @return mixed|null
      */
     public function set($key, $value, $minutes);
 
@@ -29,7 +29,7 @@ interface CacheInterface
      *
      * @param $key
      *
-     * @return void
+     * @return mixed| null
      */
     public function delete($key);
 }
