@@ -101,7 +101,12 @@ class Example
     ;
     $passengersIterator->add($passenger);
     $client->setPassengers($passengersIterator);
-    
+
+    // 6. set customer
+    // 6.1 one of the passengers can be the customer, if you already call setPassengers method
+    $client->setCustomer($passenger);
+
+    // 6.2 or you can create a customer object
     $customer = new Customer();
     $customer
         ->setFirstName('firstName')
@@ -170,8 +175,9 @@ class Example
  * @method array setSegment(array $args)
  * @method array clearSegments(array $args)
  * @method array getTotalCost()
- * @method array setCustomer(array $args)
  * @method array setPassengers(array $args)
+ * @method array setCustomer(array $args)
+ * @method array setPassengerAsCustomer(array $args)
  * @method array setFormOfPayment(array $args)
  * @method array getCurrentBooking()
  * @method array finalizeBooking() - confirm booking

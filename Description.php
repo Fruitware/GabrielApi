@@ -322,6 +322,96 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                     'uri' => '/GabrielAPI/Booking/GetTotalCost',
                     'responseModel' => 'getResponse',
                 ],
+                'setPassengers' => [
+                    'httpMethod' => 'GET',
+                    'uri' => '/GabrielAPI/Booking/SetPassengers',
+                    'responseModel' => 'getResponse',
+                    'parameters' => [
+                        'passengers' => [
+                            'type' => 'array',
+                            'location' => 'query',
+                            'required' => true,
+                            'items' => [
+                                [
+                                    'passenger_id' => [
+                                        'type' => 'string',
+                                        'location' => 'query',
+                                        'required' => true,
+                                        'description' => 'Passenger id, starting from 0'
+                                    ],
+                                    'first_name' => [
+                                        'type' => 'string',
+                                        'location' => 'query',
+                                        'required' => true,
+                                        'description' => 'First Name'
+                                    ],
+                                    'last_name' => [
+                                        'type' => 'string',
+                                        'location' => 'query',
+                                        'required' => true,
+                                        'description' => 'Last Name'
+                                    ],
+                                    'birth_date' => [
+                                        'type' => 'string',
+                                        'location' => 'query',
+                                        'required' => true,
+                                        'description' => 'Birth date'
+                                    ],
+                                    'gender' => [
+                                        'type' => 'string',
+                                        'location' => 'query',
+                                        'required' => true,
+                                        'example' => 'M or F'
+                                    ],
+                                    'title' => [
+                                        'type' => 'string',
+                                        'location' => 'query',
+                                        'required' => true,
+                                        'example' => 'Mr, Mrs, Mss, Dr, etc.'
+                                    ],
+                                    'Passport' => [
+                                        'type' => 'string',
+                                        'location' => 'query',
+                                        'required' => true,
+                                        'example' => 'A0000001'
+                                    ],
+                                    'PassportIssued' => [
+                                        'type' => 'string',
+                                        'location' => 'query',
+                                        'required' => true,
+                                        'example' => '2014-01-10'
+                                    ],
+                                    'PassportExpire' => [
+                                        'type' => 'string',
+                                        'location' => 'query',
+                                        'required' => false,
+                                        'example' => '2025-01-10'
+                                    ],
+                                    'PassportCountry' => [
+                                        'type' => 'string',
+                                        'location' => 'query',
+                                        'required' => true,
+                                        'example' => 'MD'
+                                    ],
+                                    'Contact' => [
+                                        'type' => 'string',
+                                        'location' => 'query',
+                                        'required' => false,
+                                        'description' => 'Customer contact phone',
+                                        'example' => '+37322888333'
+
+                                    ],
+                                    'Email' => [
+                                        'type' => 'string',
+                                        'location' => 'query',
+                                        'required' => false,
+                                        'example' => 'ion.ciobanu@gmail.com'
+                                    ],
+                                ]
+                            ]
+                        ],
+                    ]
+                ],
                 'setCustomer' => [
                     'httpMethod' => 'GET',
                     'uri' => '/GabrielAPI/Booking/SetCustomer',
@@ -387,7 +477,6 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                             'required' => true,
                             'description' => 'Customer contact, phone',
                             'example' => '+37322888333'
-
                         ],
                         'Email' => [
                             'type' => 'string',
@@ -395,104 +484,22 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                             'required' => true,
                             'example' => 'ion.ciobanu@gmail.com'
                         ],
-                        'Passenger_id' => [
-                            'type' => 'string',
-                            'location' => 'query',
-                            'required' => false,
-                            'description' => 'Copy from passenger with item in passenger_id;
-                                            in case when customer is between passengers, and are passengers are olready registered,
-                                            this method can be called with passenger_id parameter only.
-                                            It is not allowed a combination of passenger_id and other parameters'
-                        ],
                     ]
                 ],
-                'setPassengers' => [
+                'setPassengerAsCustomer' => [
                     'httpMethod' => 'GET',
-                    'uri' => '/GabrielAPI/Booking/SetPassengers',
+                    'uri' => '/GabrielAPI/Booking/SetCustomer',
                     'responseModel' => 'getResponse',
+                    'description' => 'One of the passengers can be the customer, if you already call setPassengers method',
                     'parameters' => [
-                        'passengers' => [
-                            'type' => 'array',
+                        'passenger_id' => [
+                            'type' => 'string',
                             'location' => 'query',
                             'required' => true,
-                            'items' => [
-                                [
-                                    'passenger_id' => [
-                                        'type' => 'string',
-                                        'location' => 'query',
-                                        'required' => true,
-                                        'description' => 'Passenger id, starting from 0'
-                                    ],
-                                    'first_name' => [
-                                        'type' => 'string',
-                                        'location' => 'query',
-                                        'required' => true,
-                                        'description' => 'First Name'
-                                    ],
-                                    'last_name' => [
-                                        'type' => 'string',
-                                        'location' => 'query',
-                                        'required' => true,
-                                        'description' => 'Last Name'
-                                    ],
-                                    'birth_date' => [
-                                        'type' => 'string',
-                                        'location' => 'query',
-                                        'required' => true,
-                                        'description' => 'Birth date'
-                                    ],
-                                    'gender' => [
-                                        'type' => 'string',
-                                        'location' => 'query',
-                                        'required' => true,
-                                        'example' => 'M or F'
-                                    ],
-                                    'title' => [
-                                        'type' => 'string',
-                                        'location' => 'query',
-                                        'required' => true,
-                                        'example' => 'Mr, Mrs, Mss, Dr, etc.'
-                                    ],
-                                    'Passport' => [
-                                        'type' => 'string',
-                                        'location' => 'query',
-                                        'required' => true,
-                                        'example' => 'A0000001'
-                                    ],
-                                    'PassportIssued' => [
-                                        'type' => 'string',
-                                        'location' => 'query',
-                                        'required' => true,
-                                        'example' => '2014-01-10'
-                                    ],
-                                    'PassportExpire' => [
-                                        'type' => 'string',
-                                        'location' => 'query',
-                                        'required' => true,
-                                        'example' => '2025-01-10'
-                                    ],
-                                    'PassportCountry' => [
-                                        'type' => 'string',
-                                        'location' => 'query',
-                                        'required' => true,
-                                        'example' => 'MD'
-                                    ],
-                                    'Contact' => [
-                                        'type' => 'string',
-                                        'location' => 'query',
-                                        'required' => true,
-                                        'description' => 'Customer contact, phone',
-                                        'example' => '+37322888333'
-
-                                    ],
-                                    'Email' => [
-                                        'type' => 'string',
-                                        'location' => 'query',
-                                        'required' => true,
-                                        'example' => 'ion.ciobanu@gmail.com'
-                                    ],
-                                ]
-                            ]
+                            'description' => 'Copy from passenger with item in passenger_id;
+                                            in case when customer is between passengers, and passengers are already registered,
+                                            this method can be called with Passenger_id parameter only.
+                                            It is not allowed a combination of Passenger_id and other parameters'
                         ],
                     ]
                 ],
@@ -514,6 +521,7 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                     'httpMethod' => 'GET',
                     'uri' => '/GabrielAPI/Booking/GetCurrentBooking',
                     'responseModel' => 'getResponse',
+                    'description' => 'Get current booking info (segments, customer, passengers, total cost)',
                 ],
                 'finalizeBooking' => [
                     'httpMethod' => 'GET',

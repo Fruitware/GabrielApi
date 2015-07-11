@@ -54,15 +54,18 @@ class Client extends GuzzleHttpClient
 
         $this->guzzleClient = new GuzzleClient($this, new Description(), $config);
 
-        $this->getEmitter()->on('before', function (BeforeEvent $e) {
-            if ($e->getRequest()->getPath() !== '/GabrielAPI/Account/GetTicket') {
+        $this->getEmitter()->on('before', function (BeforeEvent $event) {
+            if ($event->getRequest()->getPath() !== '/GabrielAPI/Account/GetTicket') {
                 if (!$this->getSession()->getToken()) {
                     $this->login();
                 }
 
                 if ($this->getSession()->getToken()) {
-                    $query = $e->getRequest()->getQuery();
-                    $query->add('session_id', $this->getSession()->getToken());
+                    $event
+                        ->getRequest()
+                        ->getQuery()
+                        ->add('session_id', $this->getSession()->getToken())
+                    ;
                 }
                 else {
                     throw new BadResponseException('Request require session token');
@@ -90,9 +93,8 @@ class Client extends GuzzleHttpClient
     {
         $this->logger = $logger;
 
-        $this->logger->pushProcessor(function ($record) {
-            $token = $this->getSession()->getToken();
-            $record['extra']['token'] = $token;
+        $this->logger->pushProcessor(function (array $record) {
+            $record['extra']['token'] = $this->getSession()->getToken();
 
             return $record;
         });
@@ -231,21 +233,6 @@ class Client extends GuzzleHttpClient
     }
 
     /**
-     * Get current booking info (segments, customer, passengers, total cost)
-     *
-     * @return array
-     */
-    public function getCurrentBooking()
-    {
-        if ($this->logger) $this->logger->debug(__METHOD__.' called');
-        $result = $this->getGuzzleClient()->getCurrentBooking();
-
-        if ($this->logger) $this->logger->info(__METHOD__.' result', ['data' => $result]);
-
-        return $result;
-    }
-
-    /**
      * Search segments
      *
      * @param SearchInterface $search
@@ -332,27 +319,6 @@ class Client extends GuzzleHttpClient
     }
 
     /**
-     * @param CustomerInterface $customer
-     */
-    public function setCustomer(CustomerInterface $customer)
-    {
-        $setNewCustomer = $customer->toArray();
-        if ($this->logger) $this->logger->debug(__METHOD__.' called', ['customer' => $setNewCustomer]);
-
-        $setCustomer = $this->_getCache('setCustomer');
-
-        if ($setCustomer !== $setNewCustomer) {
-            $this->getGuzzleClient()->setCustomer($setNewCustomer);
-            $this->_setCache('setCustomer', $setNewCustomer, 10);
-        }
-        else {
-            if ($this->logger) $this->logger->debug(__METHOD__.' used from the cache');
-        }
-
-        if ($this->logger) $this->logger->info(__METHOD__.' result');
-    }
-
-    /**
      * @param \Iterator $passengersIterator
      */
     public function setPassengers(\Iterator $passengersIterator)
@@ -385,6 +351,38 @@ class Client extends GuzzleHttpClient
     }
 
     /**
+     * @param CustomerInterface $customer
+     */
+    public function setCustomer(CustomerInterface $customer)
+    {
+        if ($customer instanceof PassengerInterface) {
+            $setNewCustomer = $customer->toCustomerArray();
+        }
+        else {
+            $setNewCustomer = $customer->toArray();
+        }
+
+        if ($this->logger) $this->logger->debug(__METHOD__.' called', ['customer' => $setNewCustomer]);
+
+        $setCustomer = $this->_getCache('setCustomer');
+
+        if ($setCustomer !== $setNewCustomer) {
+            if ($customer instanceof PassengerInterface) {
+                $this->getGuzzleClient()->setPassengerAsCustomer($setNewCustomer);
+            }
+            else {
+                $this->getGuzzleClient()->setCustomer($setNewCustomer);
+            }
+            $this->_setCache('setCustomer', $setNewCustomer, 10);
+        }
+        else {
+            if ($this->logger) $this->logger->debug(__METHOD__.' used from the cache');
+        }
+
+        if ($this->logger) $this->logger->info(__METHOD__.' result');
+    }
+
+    /**
      * Set payment type: CA – cash, CC – credit card, IN – invoice
      *
      * @param string $type
@@ -408,18 +406,6 @@ class Client extends GuzzleHttpClient
         else {
             if ($this->logger) $this->logger->debug(__METHOD__.' used from the cache');
         }
-
-        if ($this->logger) $this->logger->info(__METHOD__.' result');
-    }
-
-    /**
-     * Confirm reservation
-     */
-    public function finalizeBooking()
-    {
-        if ($this->logger) $this->logger->debug(__METHOD__.' called');
-
-        $this->getGuzzleClient()->finalizeBooking();
 
         if ($this->logger) $this->logger->info(__METHOD__.' result');
     }

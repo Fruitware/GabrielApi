@@ -23,8 +23,9 @@ use Psr\Log\LoggerInterface;
  * @method array setSegment(array $args)
  * @method array clearSegments(array $args)
  * @method array getTotalCost()
- * @method array setCustomer(array $args)
  * @method array setPassengers(array $args)
+ * @method array setCustomer(array $args)
+ * @method array setPassengerAsCustomer(array $args)
  * @method array setFormOfPayment(array $args)
  * @method array getCurrentBooking()
  * @method array finalizeBooking() - confirm
@@ -77,7 +78,7 @@ class GuzzleClient extends \GuzzleHttp\Command\Guzzle\GuzzleClient
      */
     public function __call($name, array $arguments)
     {
-        if ($this->logger) $this->logger->info(__METHOD__.' -> '.$name.' request', ['data' => $arguments]);
+        if ($this->logger) $this->logger->debug(__METHOD__.' -> '.$name.' request', ['data' => $arguments]);
 
         try {
             $response = parent::__call($name, $arguments);

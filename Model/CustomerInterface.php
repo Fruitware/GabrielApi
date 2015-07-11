@@ -14,6 +14,11 @@ interface CustomerInterface
     const GENDER_UNDISCLOSED = 'U';
 
     /**
+     * @return array
+     */
+    public function toArray();
+
+    /**
      * @param string $firstName
      *
      * @return $this
@@ -144,9 +149,4 @@ interface CustomerInterface
      * @return string
      */
     public function getEmail();
-
-    /**
-     * @return array
-     */
-    public function toArray();
 }
