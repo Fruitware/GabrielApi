@@ -18,7 +18,7 @@ composer require fruitware/gabriel-api
 ```php
 namespace MyProject;
 
-use Fruitware\GabrielApi\Client;
+use Fruitware\GabrielApi\GabrielClient;
 use Fruitware\GabrielApi\Model\Customer;
 use Fruitware\GabrielApi\Model\CustomerInterface;
 use Fruitware\GabrielApi\Model\Passenger;
@@ -27,6 +27,7 @@ use Fruitware\GabrielApi\Model\PassengerIterator;
 use Fruitware\GabrielApi\Model\Search;
 use Fruitware\GabrielApi\Model\SearchInterface;
 use Fruitware\GabrielApi\Session;
+use GuzzleHttp\Client;
 use GuzzleHttp\Subscriber\Log\Formatter;
 use GuzzleHttp\Subscriber\Log\LogSubscriber;
 use Monolog\Formatter\LineFormatter;
@@ -37,7 +38,8 @@ class Example
 {
     // init Client
     Session::setCredentials('YOUR_LOGIN', 'YOUR_PASSWORD');
-    $client = new Client(new Session(), ['base_url' => 'https://b2b.airmoldova.md/']);
+    $guzzleClient = new Client(['base_url' => 'https://b2b.airmoldova.md/']);
+    $client = new GabrielClient($guzzleClient);
 
     // set cache, if you want (your class must implement Fruitware\GabrielApi\CacheInterface)
     $client->setCache(new Cache());
@@ -46,14 +48,13 @@ class Example
     $log = new Logger('gabriel_guzzle_request');
     $log->pushHandler(new StreamHandler(__DIR__.'/logs/gabriel_guzzle_request.log', Logger::DEBUG));
     $subscriber = new LogSubscriber($log, Formatter::SHORT);
-    $client->getEmitter()->attach($subscriber);
+    $client->getHttpClient()->getEmitter()->attach($subscriber);
 
-    // create a log for client class, if you want
+    // create a log for client class, if you want (monolog/monolog required)
     $logger = new Logger('gabriel_api');
     $stream = new StreamHandler(__DIR__.'/logs/gabriel_api.log', Logger::DEBUG);
     $output = "%extra.token%: [%datetime%] %channel%.%level_name%: %message% %context% %extra%\n";
-    $formatter = new LineFormatter($output, 'Y-m-d H:i:s');
-    $stream->setFormatter($formatter);
+    $stream->setFormatter(new LineFormatter($output, 'Y-m-d H:i:s'));
     $logger->pushHandler($stream);
     $client->setLogger($logger);
 
@@ -117,7 +118,7 @@ class Example
         ->setPassport('A0000001')
         ->setPassportIssued(new \DateTime('2014-01-10'))
         ->setPassportExpire(new \DateTime('2017-01-10'))
-        ->setMobilePhone('+37322888333')
+        ->setMobilePhone('+37322123456')
         ->setEmail('example@example.com')
     ;
     $client->setCustomer($customer);
