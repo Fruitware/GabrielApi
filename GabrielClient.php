@@ -56,9 +56,9 @@ class GabrielClient extends \GuzzleHttp\Command\Guzzle\GuzzleClient
      */
     public function __construct(ClientInterface $client = null, SessionInterface $session = null, DescriptionInterface $description = null, array $config = [])
     {
-        $this->session = $session instanceof SessionInterface ?: new Session();
-        $client = $client instanceof ClientInterface ?: new Client();
-        $description = $description instanceof DescriptionInterface ?: new Description();
+        $this->session = $session instanceof SessionInterface  ? $session : new Session();
+        $client = $client instanceof ClientInterface ? $client : new Client();
+        $description = $description instanceof DescriptionInterface ? $description : new Description();
 
         parent::__construct($client, $description, $config);
 
