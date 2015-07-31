@@ -239,6 +239,13 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                             'required' => true,
                             'description' => 'Search identifier – ability to have more than one active searches'
                         ],
+                        'direct_search' => [
+                            'type' => 'boolean',
+                            'location' => 'json',
+                            'default' => false,
+                            'required' => false,
+                            'description' => 'Ignore cache of available segments. Default is false'
+                        ]
                     ]
                 ],
                 # custom method

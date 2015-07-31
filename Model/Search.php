@@ -50,6 +50,11 @@ class Search implements SearchInterface
     protected $searchOption = 1;
 
     /**
+     * @var bool
+     */
+    protected $directSearch = false;
+
+    /**
      * @param string $lang
      *
      * @return $this
@@ -227,5 +232,25 @@ class Search implements SearchInterface
     public function getSearchOption()
     {
         return $this->searchOption;
+    }
+
+    /**
+     * @param bool $directSearch
+     *
+     * @return $this
+     */
+    public function setDirectSearch($directSearch)
+    {
+        $this->directSearch = $directSearch;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDirectSearch()
+    {
+        return $this->directSearch;
     }
 }

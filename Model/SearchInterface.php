@@ -133,4 +133,16 @@ interface SearchInterface
      * @return int
      */
     public function getSearchOption();
+
+    /**
+     * @param bool $directSearch
+     *
+     * @return $this
+     */
+    public function setDirectSearch($directSearch);
+
+    /**
+     * @return bool
+     */
+    public function getDirectSearch();
 }

@@ -73,6 +73,7 @@ class Example
         ->setChildren(0) // default 0
         ->setInfants(0) // default 0
         ->setSearchOption(1) // default 1
+        ->setDirectSearch(false)// default false
     ;
     $segments = $client->search($search);
     var_dump($segments);

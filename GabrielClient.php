@@ -311,22 +311,24 @@ class GabrielClient extends \GuzzleHttp\Command\Guzzle\GuzzleClient
     }
 
     /**
-     * @param           $departureAirport
-     * @param           $arrivalAirport
-     * @param \DateTime $departureDate
-     * @param \DateTime $returnDate
-     * @param           $searchOption
+     * @param           $departureAirport - Departure airport/city
+     * @param           $arrivalAirport - Arrival airport/city
+     * @param \DateTime $departureDate - Departure date
+     * @param \DateTime $returnDate - Return date
+     * @param int       $searchOption - Search identifier – ability to have more than one active searches
+     * @param bool      $directSearch - Ignore cache of available segments. Default is false
      *
      * @return array
      */
-    public function getSegments($departureAirport, $arrivalAirport, \DateTime $departureDate, \DateTime $returnDate = null, $searchOption = 1)
+    public function getSegments($departureAirport, $arrivalAirport, \DateTime $departureDate, \DateTime $returnDate = null, $searchOption = 1, $directSearch = false)
     {
         $newGetSegmentsArgs = [
             'airport_from'  => $departureAirport,
             'airport_to'    => $arrivalAirport,
             'dep_date'      => $departureDate->format('Y-m-d'),
             'ret_date'      => $returnDate ? $returnDate->format('Y-m-d') : null,
-            'search_option' => $searchOption
+            'search_option' => $searchOption,
+            'direct_search' => $directSearch
         ];
 
         $getSegmentsArgs = $this->_getCache('getSegmentsArgs');
