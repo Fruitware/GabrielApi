@@ -400,22 +400,12 @@ class GabrielClient extends \GuzzleHttp\Command\Guzzle\GuzzleClient
      */
     public function setCustomer(CustomerInterface $customer)
     {
-        if ($customer instanceof PassengerInterface) {
-            $setNewCustomer = $customer->toCustomerArray();
-        }
-        else {
-            $setNewCustomer = $customer->toArray();
-        }
+        $setNewCustomer = $customer->toArray();
 
         $setCustomer = $this->_getCache('setCustomer');
 
         if ($setCustomer !== $setNewCustomer) {
-            if ($customer instanceof PassengerInterface) {
-                $this->setPassengerAsCustomer($setNewCustomer);
-            }
-            else {
-                parent::setCustomer($setNewCustomer);
-            }
+            parent::setCustomer($setNewCustomer);
             $this->_setCache('setCustomer', $setNewCustomer, 10);
         }
         else {
