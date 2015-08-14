@@ -50,6 +50,13 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                     'httpMethod' => 'GET',
                     'uri' => '/GabrielAPI/Settings/GetSupportedLanguages',
                     'responseModel' => 'getResponse',
+                    'parameters' => [
+                        'session_id' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => false,
+                        ]
+                    ]
                 ],
                 'changeLanguage' => [
                     'httpMethod' => 'POST',
@@ -62,6 +69,11 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                             'required' => true,
                             'description' => 'Language culture code',
                             'example' => 'ru-RU'
+                        ],
+                        'session_id' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => false,
                         ]
                     ]
                 ],
@@ -76,6 +88,11 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                             'required' => true,
                             'description' => 'Partial name or ISO code of searching country',
                             'example' => 'MD or MOL'
+                        ],
+                        'session_id' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => false,
                         ]
                     ]
                 ],
@@ -90,6 +107,11 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                             'required' => true,
                             'description' => 'Partial name or ISO code of searching city',
                             'example' => 'KIV or CHI'
+                        ],
+                        'session_id' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => false,
                         ]
                     ]
                 ],
@@ -104,6 +126,11 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                             'required' => true,
                             'description' => 'Partial name or IATA code of searching airline',
                             'example' => '9U'
+                        ],
+                        'session_id' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => false,
                         ]
                     ]
                 ],
@@ -111,6 +138,13 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                     'httpMethod' => 'GET',
                     'uri' => '/GabrielAPI/Info/GetBestPrice',
                     'responseModel' => 'getResponse',
+                    'parameters' => [
+                        'session_id' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => false,
+                        ]
+                    ]
                 ],
                 'getCalendarShopping' => [
                     'httpMethod' => 'POST',
@@ -141,6 +175,11 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                             'required' => false,
                             'description' => 'Ending searching date',
                         ],
+                        'session_id' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => false,
+                        ]
                     ]
                 ],
                 'getCurrencyExchange' => [
@@ -168,6 +207,11 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                             'required' => true,
                             'description' => 'Amount to convert',
                             'example' => '100.01',
+                        ],
+                        'session_id' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => false,
                         ]
                     ]
                 ],
@@ -175,6 +219,13 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                     'httpMethod' => 'GET',
                     'uri' => '/GabrielAPI/Booking/GetDefaultSearchSettings',
                     'responseModel' => 'getResponse',
+                    'parameters' => [
+                        'session_id' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => false,
+                        ]
+                    ]
                 ],
                 'setNumberOfPassengers' => [
                     'httpMethod' => 'POST',
@@ -198,6 +249,11 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                             'location' => 'json',
                             'required' => true,
                             'description' => 'Number of infants (under 2 years)',
+                        ],
+                        'session_id' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => false,
                         ]
                     ]
                 ],
@@ -245,6 +301,11 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                             'default' => false,
                             'required' => false,
                             'description' => 'Ignore cache of available segments. Default is false'
+                        ],
+                        'session_id' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => false,
                         ]
                     ]
                 ],
@@ -260,6 +321,11 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                             'required' => true,
                             'description' => 'Search identifier – ability to have more than one active searches'
                         ],
+                        'session_id' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => false,
+                        ]
                     ]
                 ],
                 'getFareNotes' => [
@@ -285,6 +351,11 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                             'required' => false,
                             'description' => 'Reference to price option back if is roundtrip search'
                         ],
+                        'session_id' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => false,
+                        ]
                     ]
                 ],
                 'setSegment' => [
@@ -310,6 +381,11 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                             'required' => false,
                             'description' => 'Reference to price option back if is roundtrip search'
                         ],
+                        'session_id' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => false,
+                        ]
                     ]
                 ],
                 'clearSegments' => [
@@ -323,18 +399,35 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                             'required' => true,
                             'description' => 'Reference to searching identifier search_option'
                         ],
+                        'session_id' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => false,
+                        ]
                     ]
                 ],
                 'getTotalCost' => [
                     'httpMethod' => 'GET',
                     'uri' => '/GabrielAPI/Booking/GetTotalCost',
                     'responseModel' => 'getResponse',
+                    'parameters' => [
+                        'session_id' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => false,
+                        ]
+                    ]
                 ],
                 'setPassengers' => [
                     'httpMethod' => 'POST',
                     'uri' => '/GabrielAPI/Booking/SetPassengers',
                     'responseModel' => 'getResponse',
                     'parameters' => [
+                        'session_id' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => false,
+                        ],
                         'passengers' => [
                             'type' => 'array',
                             'location' => 'json',
@@ -492,6 +585,11 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                             'required' => true,
                             'example' => 'ion.ciobanu@gmail.com'
                         ],
+                        'session_id' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => false,
+                        ]
                     ]
                 ],
                 'setPassengerAsCustomer' => [
@@ -509,6 +607,11 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                                             this method can be called with Passenger_id parameter only.
                                             It is not allowed a combination of Passenger_id and other parameters'
                         ],
+                        'session_id' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => false,
+                        ]
                     ]
                 ],
                 'setFormOfPayment' => [
@@ -523,6 +626,11 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                             'description' => 'CA – cash, CC – credit card, IN – invoice',
                             'example' => 'CA'
                         ],
+                        'session_id' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => false,
+                        ]
                     ]
                 ],
                 'getCurrentBooking' => [
@@ -530,12 +638,26 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                     'uri' => '/GabrielAPI/Booking/GetCurrentBooking',
                     'responseModel' => 'getResponse',
                     'description' => 'Get current booking info (segments, customer, passengers, total cost)',
+                    'parameters' => [
+                        'session_id' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => false,
+                        ]
+                    ]
                 ],
                 'finalizeBooking' => [
                     'httpMethod' => 'GET',
                     'uri' => '/GabrielAPI/Booking/FinalizeBooking',
                     'responseModel' => 'getResponse',
                     'description' => 'Confirm reservation',
+                    'parameters' => [
+                        'session_id' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => false,
+                        ]
+                    ]
                 ],
             ],
             'models' => [

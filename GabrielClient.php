@@ -11,6 +11,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Command\Guzzle\DescriptionInterface;
 use GuzzleHttp\Event\BeforeEvent;
+use GuzzleHttp\Stream\Stream;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -73,10 +74,11 @@ class GabrielClient extends \GuzzleHttp\Command\Guzzle\GuzzleClient
                 }
 
                 if ($this->getSession()->getToken()) {
-                    $event
-                        ->getRequest()
-                        ->getQuery()
-                        ->add('session_id', $this->getSession()->getToken());
+                    $result = json_decode((string)$event->getRequest()->getBody(), true);
+                    $result = is_array($result) ? $result : [];
+                    $result['session_id'] = $this->getSession()->getToken();
+                    $stream = Stream::factory(json_encode($result));
+                    $event->getRequest()->setBody($stream);
                 } else {
                     throw new BadResponseException('Request require session token');
                 }
