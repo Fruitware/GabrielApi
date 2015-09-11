@@ -47,7 +47,7 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                     ]
                 ],
                 'getSupportedLanguages' => [
-                    'httpMethod' => 'GET',
+                    'httpMethod' => 'POST',
                     'uri' => '/GabrielAPI/Settings/GetSupportedLanguages',
                     'responseModel' => 'getResponse',
                     'parameters' => [
@@ -135,7 +135,7 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                     ]
                 ],
                 'getBestPrice' => [
-                    'httpMethod' => 'GET',
+                    'httpMethod' => 'POST',
                     'uri' => '/GabrielAPI/Info/GetBestPrice',
                     'responseModel' => 'getResponse',
                     'parameters' => [
@@ -216,7 +216,7 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                     ]
                 ],
                 'getDefaultSearchSettings' => [
-                    'httpMethod' => 'GET',
+                    'httpMethod' => 'POST',
                     'uri' => '/GabrielAPI/Booking/GetDefaultSearchSettings',
                     'responseModel' => 'getResponse',
                     'parameters' => [
@@ -311,7 +311,7 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                 ],
                 # custom method
                 'getSegmentsSearchHistory' => [
-                    'httpMethod' => 'GET',
+                    'httpMethod' => 'POST',
                     'uri' => '/GabrielAPI/Booking/GetSegments',
                     'responseModel' => 'getResponse',
                     'parameters' => [
@@ -329,7 +329,7 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                     ]
                 ],
                 'getFareNotes' => [
-                    'httpMethod' => 'GET',
+                    'httpMethod' => 'POST',
                     'uri' => '/GabrielAPI/Booking/GetFareNotes',
                     'responseModel' => 'getResponse',
                     'parameters' => [
@@ -389,7 +389,7 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                     ]
                 ],
                 'clearSegments' => [
-                    'httpMethod' => 'GET',
+                    'httpMethod' => 'POST',
                     'uri' => '/GabrielAPI/Booking/ClearSegments',
                     'responseModel' => 'getResponse',
                     'parameters' => [
@@ -407,7 +407,7 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                     ]
                 ],
                 'getTotalCost' => [
-                    'httpMethod' => 'GET',
+                    'httpMethod' => 'POST',
                     'uri' => '/GabrielAPI/Booking/GetTotalCost',
                     'responseModel' => 'getResponse',
                     'parameters' => [
@@ -634,7 +634,7 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                     ]
                 ],
                 'getCurrentBooking' => [
-                    'httpMethod' => 'GET',
+                    'httpMethod' => 'POST',
                     'uri' => '/GabrielAPI/Booking/GetCurrentBooking',
                     'responseModel' => 'getResponse',
                     'description' => 'Get current booking info (segments, customer, passengers, total cost)',
@@ -647,7 +647,7 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                     ]
                 ],
                 'finalizeBooking' => [
-                    'httpMethod' => 'GET',
+                    'httpMethod' => 'POST',
                     'uri' => '/GabrielAPI/Booking/FinalizeBooking',
                     'responseModel' => 'getResponse',
                     'description' => 'Confirm reservation',

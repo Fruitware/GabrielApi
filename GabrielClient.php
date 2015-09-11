@@ -21,6 +21,7 @@ use Psr\Log\LoggerInterface;
  * @method array getCurrencyExchange(array $args)
  * @method array getDefaultSearchSettings()
  * @method array getSegmentsSearchHistory(array $args)
+ * @method array getFareNotes(array $args)
  * @method array clearSegments(array $args)
  * @method array getTotalCost()
  * @method array setPassengerAsCustomer(array $args)
@@ -349,7 +350,7 @@ class GabrielClient extends \GuzzleHttp\Command\Guzzle\GuzzleClient
 
     /**
      * @param int      $optionId     Selected price option
-     * @param null|int $optionIdBack Selected price option back if is roundtrip search
+     * @param null|int $optionIdBack Selected price option back if is round trip search
      * @param int      $searchOption Reference to searching identifier search_option
      */
     public function setSegment($optionId, $optionIdBack = null, $searchOption = 1)
@@ -363,7 +364,9 @@ class GabrielClient extends \GuzzleHttp\Command\Guzzle\GuzzleClient
         ];
 
         if ($setSegments !== $segments) {
+            $this->getFareNotes($segments); // always need to be executed before setSegment
             parent::setSegment($segments);
+            $this->getTotalCost(); // always need to be executed after setSegment
             $this->_setCache('setSegments', $segments, 10);
         }
         else {
