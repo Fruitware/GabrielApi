@@ -42,7 +42,7 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                         'session_id' => [
                             'type' => 'string',
                             'location' => 'json',
-                            'required' => true,
+                            'required' => false,
                         ]
                     ]
                 ],
