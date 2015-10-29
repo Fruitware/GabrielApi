@@ -17,6 +17,21 @@ interface InvoiceInterface
     public function get($field);
 
     /**
+     * @return bool
+     */
+    public function isExpired();
+
+    /**
+     * @return bool
+     */
+    public function isPaid();
+
+    /**
+     * @return bool
+     */
+    public function isUnpaid();
+
+    /**
      * @return DateTime
      */
     public function getExpiredAt();

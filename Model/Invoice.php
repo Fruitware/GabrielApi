@@ -6,6 +6,8 @@ use DateTime;
 
 class Invoice implements InvoiceInterface
 {
+    protected $dateTimeZone;
+
     /**
      * @var array
      */
@@ -17,6 +19,7 @@ class Invoice implements InvoiceInterface
     public function __construct(array $data)
     {
         $this->data = $data;
+        $this->dateTimeZone = new \DateTimeZone('Europe/Chisinau');
     }
 
     /**
@@ -28,11 +31,39 @@ class Invoice implements InvoiceInterface
     }
 
     /**
+     * @return bool
+     */
+    public function isExpired()
+    {
+        $now = new DateTime('now', $this->dateTimeZone);
+
+        return $this->getExpiredAt() < $now;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPaid()
+    {
+        return $this->getStatus() === 'Paid';
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUnpaid()
+    {
+        return $this->getStatus() === 'Unpaid';
+    }
+
+    /**
      * @return DateTime
      */
     public function getExpiredAt()
     {
-        return DateTime::createFromFormat('Y-m-d\TH:i:s', $this->get('ExpiryDate'));
+        $date = DateTime::createFromFormat('Y-m-d\TH:i:s', $this->get('ExpiryDate'), $this->dateTimeZone);
+        // fix api time zone
+        return $date->modify('+1 hour');
     }
 
     /**
