@@ -3,6 +3,7 @@
 namespace Fruitware\GabrielApi\Invoice;
 
 use Fruitware\GabrielApi\Exception\BadResponseException;
+use Fruitware\GabrielApi\Model\Invoice;
 use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Command\Guzzle\DescriptionInterface;
@@ -73,13 +74,15 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
     /**
      * @param string $invoiceNumber
      *
-     * @return array
+     * @return Invoice
      */
     public function get($invoiceNumber)
     {
-        return parent::get([
+        $data = parent::get([
             'OwnerKey' => $invoiceNumber
         ]);
+
+        return new Invoice($data);
     }
 
     /**
