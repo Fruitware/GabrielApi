@@ -11,14 +11,16 @@ composer require fruitware/gabriel-api
 
 ## Help and docs
 
-- [Documentation](https://github.com/Fruitware/GabrielApi/blob/master/docs/9U_Qsystem_B2B_portal.pdf)
+- [Reservation documentation](https://github.com/Fruitware/GabrielApi/blob/master/docs/Protocol_JSON_B2B_Portal.pdf)
+- [Invoice documentation](https://github.com/Fruitware/GabrielApi/blob/master/docs/Invoice_API.pdf)
 
-## Usage
+## Usage of ticket reservation
 
 ```php
 namespace MyProject;
 
-use Fruitware\GabrielApi\GabrielClient;
+use Fruitware\GabrielApi\Gabriel\Client;
+use Fruitware\GabrielApi\Gabriel\Session;
 use Fruitware\GabrielApi\Model\Customer;
 use Fruitware\GabrielApi\Model\CustomerInterface;
 use Fruitware\GabrielApi\Model\Passenger;
@@ -26,8 +28,7 @@ use Fruitware\GabrielApi\Model\PassengerInterface;
 use Fruitware\GabrielApi\Model\PassengerIterator;
 use Fruitware\GabrielApi\Model\Search;
 use Fruitware\GabrielApi\Model\SearchInterface;
-use Fruitware\GabrielApi\Session;
-use GuzzleHttp\Client;
+use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Subscriber\Log\Formatter;
 use GuzzleHttp\Subscriber\Log\LogSubscriber;
 use Monolog\Formatter\LineFormatter;
@@ -37,9 +38,9 @@ use Monolog\Logger;
 class Example 
 {
     // init Client
-    Session::setCredentials('YOUR_LOGIN', 'YOUR_PASSWORD');
-    $guzzleClient = new Client(['base_url' => 'https://b2b.airmoldova.md/']);
-    $client = new GabrielClient($guzzleClient);
+    Session::setCredentials('YOUR_GABRIEL_LOGIN', 'YOUR_GABRIEL_PASSWORD');
+    $guzzleClient = new GuzzleClient(['base_url' => 'https://b2b.airmoldova.md/']);
+    $client = new Client($guzzleClient);
 
     // set cache, if you want (your class must implement Fruitware\GabrielApi\CacheInterface)
     $client->setCache(new Cache());
@@ -138,5 +139,53 @@ class Example
     // 8. If you want cancel reservation
     $newSessionToken = $client->reset();
     var_dump($newSessionToken); // or var_dump($client->getSession()->getToken());
+}
+```
+
+## Usage of invoice api
+
+```php
+namespace MyProject;
+
+use Fruitware\GabrielApi\Invoice\Client;
+use Fruitware\GabrielApi\Invoice\Session;
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Subscriber\Log\Formatter;
+use GuzzleHttp\Subscriber\Log\LogSubscriber;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+
+class Example 
+{
+    // init Client
+    Session::setCredentials('YOUR_INVOICE_LOGIN', 'YOUR_INVOICE_PASSWORD');
+    $guzzleClient = new GuzzleClient(['base_url' => 'https://b2b.airmoldova.md/']);
+    $client = new Client($guzzleClient);
+
+    // create a log channel for guzzle requests, if you want
+    $log = new Logger('gabriel_guzzle_request');
+    $log->pushHandler(new StreamHandler(__DIR__.'/logs/gabriel_guzzle_request.log', Logger::DEBUG));
+    $subscriber = new LogSubscriber($log, Formatter::SHORT);
+    $client->getHttpClient()->getEmitter()->attach($subscriber);
+
+    // create a log for client class, if you want (monolog/monolog required)
+    $logger = new Logger('gabriel_api');
+    $stream = new StreamHandler(__DIR__.'/logs/gabriel_api.log', Logger::DEBUG);
+    $output = "%extra.token%: [%datetime%] %channel%.%level_name%: %message% %context% %extra%\n";
+    $stream->setFormatter(new LineFormatter($output, 'Y-m-d H:i:s'));
+    $logger->pushHandler($stream);
+    $client->setLogger($logger);
+
+    // 1. Get invoice by number
+    $invoiceNumber = '123456';
+    $invoice = $client->get($invoiceNumber);
+    var_dump($invoice);
+
+    // 2. Pay invoice - REAL invoice. 
+    // if you want to cancel the invoice, then you should be in the administrator role on the site https://b2b.airmoldova.md/ by the user YOUR_INVOICE_LOGIN
+    $paymentTypeCode = 0; // 0 - cash, 1 - card, 2+ - reserved
+    $transactionNumber = '67567'; // receipt number for cash type or card number for card type
+    $invoice = $client->pay($invoiceNumber);
 }
 ```

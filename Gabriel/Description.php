@@ -1,6 +1,6 @@
 <?php
 
-namespace Fruitware\GabrielApi;
+namespace Fruitware\GabrielApi\Gabriel;
 
 class Description extends \GuzzleHttp\Command\Guzzle\Description
 {

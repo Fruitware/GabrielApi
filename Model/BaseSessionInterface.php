@@ -1,8 +1,8 @@
 <?php
 
-namespace Fruitware\GabrielApi;
+namespace Fruitware\GabrielApi\Model;
 
-interface SessionInterface
+interface BaseSessionInterface
 {
     /**
      * Set the login and password to be used for API requests.
@@ -11,16 +11,6 @@ interface SessionInterface
      * @param string $password
      */
     public static function setCredentials($login, $password);
-
-    /**
-     * @param string $token
-     */
-    public function setToken($token);
-
-    /**
-     * @return string
-     */
-    public function getToken();
 
     /**
      * @return string

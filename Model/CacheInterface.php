@@ -1,6 +1,6 @@
 <?php
 
-namespace Fruitware\GabrielApi;
+namespace Fruitware\GabrielApi\Model;
 
 interface CacheInterface
 {

@@ -1,13 +1,14 @@
 <?php
 
-namespace Fruitware\GabrielApi;
+namespace Fruitware\GabrielApi\Gabriel;
 
+use Fruitware\GabrielApi\Model\CacheInterface;
 use Fruitware\GabrielApi\Exception\BadResponseException;
 use Fruitware\GabrielApi\Model\CustomerInterface;
 use Fruitware\GabrielApi\Model\PassengerInterface;
 use Fruitware\GabrielApi\Model\PaymentInterface;
 use Fruitware\GabrielApi\Model\SearchInterface;
-use GuzzleHttp\Client;
+use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Command\Guzzle\DescriptionInterface;
 use GuzzleHttp\Event\BeforeEvent;
@@ -28,7 +29,7 @@ use Psr\Log\LoggerInterface;
  * @method array getCurrentBooking()
  * @method array finalizeBooking() - confirm
  */
-class GabrielClient extends \GuzzleHttp\Command\Guzzle\GuzzleClient
+class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
 {
     /**
      * @var SessionInterface
@@ -59,7 +60,7 @@ class GabrielClient extends \GuzzleHttp\Command\Guzzle\GuzzleClient
     public function __construct(ClientInterface $client = null, SessionInterface $session = null, DescriptionInterface $description = null, array $config = [])
     {
         $this->session = $session instanceof SessionInterface  ? $session : new Session();
-        $client = $client instanceof ClientInterface ? $client : new Client();
+        $client = $client instanceof ClientInterface ? $client : new GuzzleClient();
         $description = $description instanceof DescriptionInterface ? $description : new Description();
 
         parent::__construct($client, $description, $config);

@@ -1,8 +1,10 @@
 <?php
 
-namespace Fruitware\GabrielApi;
+namespace Fruitware\GabrielApi\Gabriel;
 
-class Session implements SessionInterface
+use Fruitware\GabrielApi\Model\BaseSession;
+
+class Session extends BaseSession implements SessionInterface
 {
     /**
      * @var string
