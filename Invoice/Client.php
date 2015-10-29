@@ -114,8 +114,8 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
             $response = parent::__call($name, $arguments);
 
             if ($this->checkSuccessResponse($response)) {
-                if ($this->logger) $this->logger->info(__METHOD__.' -> '.$name.' result', ['data' => $response['result']]);
-                return $response['result'];
+                if ($this->logger) $this->logger->info(__METHOD__.' -> '.$name.' result', ['data' => $response]);
+                return $response;
             }
         }
         catch (\Exception $ex) {
