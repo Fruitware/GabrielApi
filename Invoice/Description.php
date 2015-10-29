@@ -24,12 +24,12 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                         'login' => [
                             'type' => 'string',
                             'location' => 'json',
-                            'required' => true,
+                            'required' => false,
                         ],
                         'password' => [
                             'type' => 'string',
                             'location' => 'json',
-                            'required' => true,
+                            'required' => false,
                         ],
                         'OwnerKey' => [
                             'type' => 'string',
@@ -48,12 +48,12 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                         'login' => [
                             'type' => 'string',
                             'location' => 'json',
-                            'required' => true,
+                            'required' => false,
                         ],
                         'password' => [
                             'type' => 'string',
                             'location' => 'json',
-                            'required' => true,
+                            'required' => false,
                         ],
                         'OwnerKey' => [
                             'type' => 'string',
