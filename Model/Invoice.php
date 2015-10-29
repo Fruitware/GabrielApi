@@ -32,7 +32,7 @@ class Invoice implements InvoiceInterface
      */
     public function getExpiredAt()
     {
-        return DateTime::createFromFormat(DateTime::ISO8601, $this->get('ExpiryDate'));
+        return DateTime::createFromFormat('Y-m-d\TH:i:s', $this->get('ExpiryDate'));
     }
 
     /**
