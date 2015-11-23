@@ -121,7 +121,7 @@ class Search implements SearchInterface
      */
     public function setDepartureDate(\DateTime $departureDate)
     {
-        $this->departureDate = $departureDate;
+        $this->departureDate = $departureDate->setTime(0, 0, 0);
 
         return $this;
     }
@@ -141,7 +141,7 @@ class Search implements SearchInterface
      */
     public function setReturnDate(\DateTime $returnDate = null)
     {
-        $this->returnDate = $returnDate;
+        $this->returnDate = $returnDate ? $returnDate->setTime(0, 0, 0) : null;
 
         return $this;
     }

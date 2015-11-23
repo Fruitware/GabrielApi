@@ -45,7 +45,7 @@ class Customer implements CustomerInterface
     protected $passportExpire;
 
     /**
-     * @var string
+     * @var string ISO 3166-2
      */
     protected $passportCountry;
 
@@ -73,6 +73,28 @@ class Customer implements CustomerInterface
             'PassportCountry' => $this->getPassportCountry(),
             'Contact' => $this->getPhone(),
             'Email' => $this->getEmail()
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    static public function getGenders()
+    {
+        return [
+            static::GENDER_MALE,
+            static::GENDER_FEMALE,
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    static public function getTitles()
+    {
+        return [
+            static::TITLE_MR,
+            static::TITLE_MS,
         ];
     }
 

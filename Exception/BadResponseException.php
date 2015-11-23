@@ -2,6 +2,6 @@
 
 namespace Fruitware\GabrielApi\Exception;
 
-class BadResponseException extends \RuntimeException
+class BadResponseException extends GabrielException
 {
 }

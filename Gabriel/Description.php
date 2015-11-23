@@ -393,9 +393,21 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                     'uri' => '/GabrielAPI/Booking/ClearSegments',
                     'responseModel' => 'getResponse',
                     'parameters' => [
+                        'option_id' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => true,
+                            'description' => 'Selected price option'
+                        ],
+                        'option_id_back' => [
+                            'type' => 'string',
+                            'location' => 'json',
+                            'required' => true,
+                            'description' => 'Selected price option back'
+                        ],
                         'search_option' => [
                             'type' => 'string',
-                            'location' => 'query',
+                            'location' => 'json',
                             'required' => true,
                             'description' => 'Reference to searching identifier search_option'
                         ],

@@ -135,6 +135,8 @@ interface SearchInterface
     public function getSearchOption();
 
     /**
+     * Ignore cached data of available segments. Default is false
+
      * @param bool $directSearch
      *
      * @return $this

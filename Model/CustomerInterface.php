@@ -6,12 +6,12 @@ interface CustomerInterface
 {
     const TITLE_MR  = 'Mr';
     const TITLE_MS  = 'Ms';
-    const TITLE_MRS = 'Mrs';
-    const TITLE_DR  = 'Dr';
+//    const TITLE_MRS = 'Mrs'; // not needed
+//    const TITLE_DR  = 'Dr'; // not needed
 
     const GENDER_MALE        = 'M';
     const GENDER_FEMALE      = 'F';
-    const GENDER_UNDISCLOSED = 'U';
+//    const GENDER_UNDISCLOSED = 'U'; // not needed
 
     /**
      * @return array

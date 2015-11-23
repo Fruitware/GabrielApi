@@ -2,6 +2,8 @@
 
 namespace Fruitware\GabrielApi\Gabriel;
 
+use Fruitware\GabrielApi\Exception\FatalException;
+use Fruitware\GabrielApi\Exception\ForbiddenLogicException;
 use Fruitware\GabrielApi\Model\CacheInterface;
 use Fruitware\GabrielApi\Exception\BadResponseException;
 use Fruitware\GabrielApi\Model\CustomerInterface;
@@ -99,6 +101,16 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
     }
 
     /**
+     * Get cache
+     *
+     * @return CacheInterface
+     */
+    public function getCache()
+    {
+        return $this->cache;
+    }
+
+    /**
      * Set logger (monolog required)
      *
      * @param LoggerInterface $logger
@@ -134,7 +146,6 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
      */
     public function login($retry = true)
     {
-
         if (!$this->getSession()->getToken()) {
             try {
                 $result = parent::login([
@@ -200,7 +211,7 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
         if (!$result) {
             $args = ['city' => $city];
             $result = parent::getCityName($args);
-            $this->_setCache($cacheKey, $result, 60);
+            $this->_setCache($cacheKey, $result, 60, false);
         }
 
         return $result;
@@ -271,6 +282,8 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
             $search->getSearchOption()
         );
 
+        $this->_setCache('search', $search, 60);
+
         return $getSegments;
     }
 
@@ -295,6 +308,8 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
      * @param int $adults
      * @param int $children
      * @param int $infants
+     *
+     * @throws ForbiddenLogicException
      */
     public function setNumberOfPassengers($adults, $children, $infants)
     {
@@ -305,8 +320,13 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
         ];
 
         if ($passengers !== $this->_getCache('numberOfPassengers')) {
+            $setSegments = $this->_getCache('setSegments');
+            if ($setSegments) {
+                throw new ForbiddenLogicException('Can\'t change number of passengers after calling setSegment method');
+            }
+
             parent::setNumberOfPassengers($passengers);
-            $this->_setCache('numberOfPassengers', $passengers, 10);
+            $this->_setCache('numberOfPassengers', $passengers, 60);
             $this->_deleteCache('getSegments');
         }
         else {
@@ -337,9 +357,21 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
 
         $getSegmentsArgs = $this->_getCache('getSegmentsArgs');
         if ($newGetSegmentsArgs !== $getSegmentsArgs || !$this->_getCache('getSegments')) {
+            if ($selectedSegments = $this->_getCache('setSegments')) {
+                try {
+                    $this->clearSegments([
+                        'option_id'      => $selectedSegments['option_id'],
+                        'option_id_back' => $selectedSegments['option_id_back'],
+                        'search_option'  => $selectedSegments['search_option']
+                    ]);
+                    $this->_deleteCache('setSegments');
+                }
+                catch(\Exception $ex){}
+            }
+
             $getSegments = parent::getSegments($newGetSegmentsArgs);
-            $this->_setCache('getSegmentsArgs', $newGetSegmentsArgs, 5);
-            $this->_setCache('getSegments', $getSegments, 5);
+            $this->_setCache('getSegmentsArgs', $newGetSegmentsArgs, 60);
+            $this->_setCache('getSegments', $getSegments, 15);
         }
         else {
             $getSegments = $this->_getCache('getSegments');
@@ -365,10 +397,24 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
         ];
 
         if ($setSegments !== $segments) {
+            // if segments was selected, need call clear and get segments
+            if ($setSegments) {
+                $getSegmentsArgs = $this->_getCache('getSegmentsArgs');
+                $this->_deleteCache('getSegments');
+                $this->getSegments(
+                    $getSegmentsArgs['airport_from'],
+                    $getSegmentsArgs['airport_to'],
+                    \DateTime::createFromFormat('Y-m-d', $getSegmentsArgs['dep_date']),
+                    \DateTime::createFromFormat('Y-m-d', $getSegmentsArgs['ret_date']),
+                    $getSegmentsArgs['search_option'],
+                    $getSegmentsArgs['direct_search']
+                );
+            }
+
             $this->getFareNotes($segments); // always need to be executed before setSegment
             parent::setSegment($segments);
             $this->getTotalCost(); // always need to be executed after setSegment
-            $this->_setCache('setSegments', $segments, 10);
+            $this->_setCache('setSegments', $segments, 60);
         }
         else {
             if ($this->logger) $this->logger->debug(__METHOD__.' used from the cache');
@@ -471,6 +517,23 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
         }
 
         if ($this->logger) $this->logger->critical(__METHOD__.' -> '.$name.' result error', ['message' => $response['message'], 'code' => $response['code']]);
+
+        // System.InvalidOperationException : There was an error generating the XML document.
+        if ($response['code'] == -1) {
+            throw new FatalException($response['message'], $response['code']);
+        }
+        // nu sunt date pentru acesta optiune
+        // numarul de locuri pentru infant depaseste numarul de locuri pentru adulti
+        // numarul de locuri depasete maximum
+        elseif ($response['code'] == 1 && stripos($response['message'], 'nu sunt date pentru acesta optiune')) {
+            throw new FatalException($response['message'], 13);
+        }
+        // SessionID has invalid format!
+        // or
+        // Document is in incorrect state for this operation. ID = 38662fb4-9985-e511-80c9-0050568e19d1; State = Canceled
+        elseif ($response['code'] == 13) {
+            throw new FatalException($response['message'], $response['code']);
+        }
 
         throw new BadResponseException($response['message'], $response['code']);
     }
