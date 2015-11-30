@@ -5,6 +5,11 @@ namespace Fruitware\GabrielApi\Model;
 class Passenger extends Customer implements PassengerInterface
 {
     /**
+     * @var string
+     */
+    protected $type;
+
+    /**
      * @var int
      */
     protected $passengerId;
@@ -35,12 +40,44 @@ class Passenger extends Customer implements PassengerInterface
     /**
      * @return array
      */
+    static public function getTypes()
+    {
+        return [
+            static::TYPE_ADULT,
+            static::TYPE_CHILD,
+            static::TYPE_INFANT,
+        ];
+    }
+
+    /**
+     * @return array
+     */
     static public function getTitles()
     {
         return array_merge([
             static::TITLE_CHD,
             static::TITLE_INF,
         ], parent::getTitles());
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return $this
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
     }
 
     /**
