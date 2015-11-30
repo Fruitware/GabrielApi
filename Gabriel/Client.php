@@ -2,8 +2,8 @@
 
 namespace Fruitware\GabrielApi\Gabriel;
 
+use Fruitware\GabrielApi\Exception\CacheExpiredException;
 use Fruitware\GabrielApi\Exception\FatalException;
-use Fruitware\GabrielApi\Exception\ForbiddenLogicException;
 use Fruitware\GabrielApi\Model\CacheInterface;
 use Fruitware\GabrielApi\Exception\BadResponseException;
 use Fruitware\GabrielApi\Model\CustomerInterface;
@@ -166,7 +166,7 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
                 throw $ex;
             }
 
-            $this->_setCache('lang', $this->defaultLang, 10);
+            $this->_setCache('lang', $this->defaultLang, 150);
         }
 
         return $this->getSession()->getToken();
@@ -282,7 +282,7 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
             $search->getSearchOption()
         );
 
-        $this->_setCache('search', $search, 60);
+        $this->_setCache('search', $search, 150);
 
         return $getSegments;
     }
@@ -297,7 +297,7 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
                 'culture_code' => $lang
             ];
             parent::changeLanguage($args);
-            $this->_setCache('lang', $lang, 10);
+            $this->_setCache('lang', $lang, 150);
         }
         else {
             if ($this->logger) $this->logger->debug(__METHOD__.' -> used from the cache');
@@ -309,7 +309,7 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
      * @param int $children
      * @param int $infants
      *
-     * @throws ForbiddenLogicException
+     * @throws CacheExpiredException
      */
     public function setNumberOfPassengers($adults, $children, $infants)
     {
@@ -322,11 +322,11 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
         if ($passengers !== $this->_getCache('numberOfPassengers')) {
             $setSegments = $this->_getCache('setSegments');
             if ($setSegments) {
-                throw new ForbiddenLogicException('Can\'t change number of passengers after calling setSegment method');
+                throw new CacheExpiredException('Can\'t change number of passengers after calling setSegment method');
             }
 
             parent::setNumberOfPassengers($passengers);
-            $this->_setCache('numberOfPassengers', $passengers, 60);
+            $this->_setCache('numberOfPassengers', $passengers, 150);
             $this->_deleteCache('getSegments');
         }
         else {
@@ -370,7 +370,7 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
             }
 
             $getSegments = parent::getSegments($newGetSegmentsArgs);
-            $this->_setCache('getSegmentsArgs', $newGetSegmentsArgs, 60);
+            $this->_setCache('getSegmentsArgs', $newGetSegmentsArgs, 150);
             $this->_setCache('getSegments', $getSegments, 15);
         }
         else {
@@ -414,7 +414,7 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
             $this->getFareNotes($segments); // always need to be executed before setSegment
             parent::setSegment($segments);
             $this->getTotalCost(); // always need to be executed after setSegment
-            $this->_setCache('setSegments', $segments, 60);
+            $this->_setCache('setSegments', $segments, 150);
         }
         else {
             if ($this->logger) $this->logger->debug(__METHOD__.' used from the cache');
@@ -519,20 +519,20 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
         if ($this->logger) $this->logger->critical(__METHOD__.' -> '.$name.' result error', ['message' => $response['message'], 'code' => $response['code']]);
 
         // System.InvalidOperationException : There was an error generating the XML document.
-        if ($response['code'] == -1) {
+        if ($response['code'] == FatalException::ERROR_INVALID_OPERATION) {
             throw new FatalException($response['message'], $response['code']);
         }
         // nu sunt date pentru acesta optiune
         // numarul de locuri pentru infant depaseste numarul de locuri pentru adulti
         // numarul de locuri depasete maximum
         elseif ($response['code'] == 1 && stripos($response['message'], 'nu sunt date pentru acesta optiune')) {
-            throw new FatalException($response['message'], 13);
+            throw new CacheExpiredException($response['message']);
         }
         // SessionID has invalid format!
         // or
         // Document is in incorrect state for this operation. ID = 38662fb4-9985-e511-80c9-0050568e19d1; State = Canceled
-        elseif ($response['code'] == 13) {
-            throw new FatalException($response['message'], $response['code']);
+        elseif ($response['code'] == FatalException::ERROR_SESSION_EXPIRED) {
+            throw new CacheExpiredException($response['message']);
         }
 
         throw new BadResponseException($response['message'], $response['code']);
