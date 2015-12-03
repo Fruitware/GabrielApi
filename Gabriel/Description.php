@@ -491,7 +491,7 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                                     'PassportIssued' => [
                                         'type' => 'string',
                                         'location' => 'json',
-                                        'required' => true,
+                                        'required' => false,
                                         'example' => '2014-01-10'
                                     ],
                                     'PassportExpire' => [
@@ -569,7 +569,7 @@ class Description extends \GuzzleHttp\Command\Guzzle\Description
                         'PassportIssued' => [
                             'type' => 'string',
                             'location' => 'json',
-                            'required' => true,
+                            'required' => false,
                             'example' => '2014-01-10'
                         ],
                         'PassportExpire' => [

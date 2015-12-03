@@ -68,8 +68,8 @@ class Customer implements CustomerInterface
             'gender' => $this->getGender(),
             'birth_date' => $this->getBirthDate()->format('Y-m-d'),
             'Passport' => $this->getPassport(),
-            'PassportIssued' => $this->getPassportIssued()->format('Y-m-d'),
-            'PassportExpire' => $this->getPassportExpire()->format('Y-m-d'),
+            'PassportIssued' => $this->getPassportIssued() ? $this->getPassportIssued()->format('Y-m-d') : null,
+            'PassportExpire' => $this->getPassportExpire() ? $this->getPassportExpire()->format('Y-m-d') : null,
             'PassportCountry' => $this->getPassportCountry(),
             'Contact' => $this->getPhone(),
             'Email' => $this->getEmail()
@@ -223,7 +223,7 @@ class Customer implements CustomerInterface
      *
      * @return $this
      */
-    public function setPassportIssued(\DateTime $passportIssued)
+    public function setPassportIssued(\DateTime $passportIssued = null)
     {
         $this->passportIssued = $passportIssued;
 
@@ -243,7 +243,7 @@ class Customer implements CustomerInterface
      *
      * @return $this
      */
-    public function setPassportExpire(\DateTime $passportExpire)
+    public function setPassportExpire(\DateTime $passportExpire = null)
     {
         $this->passportExpire = $passportExpire;
 
@@ -283,7 +283,7 @@ class Customer implements CustomerInterface
      *
      * @return $this
      */
-    public function setPhone($phone)
+    public function setPhone($phone = null)
     {
         $this->phone = $phone;
 
@@ -303,7 +303,7 @@ class Customer implements CustomerInterface
      *
      * @return $this
      */
-    public function setEmail($email)
+    public function setEmail($email = null)
     {
         $this->email = $email;
 
