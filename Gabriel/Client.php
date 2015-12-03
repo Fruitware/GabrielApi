@@ -405,7 +405,7 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
                     $getSegmentsArgs['airport_from'],
                     $getSegmentsArgs['airport_to'],
                     \DateTime::createFromFormat('Y-m-d', $getSegmentsArgs['dep_date']),
-                    \DateTime::createFromFormat('Y-m-d', $getSegmentsArgs['ret_date']),
+                    $getSegmentsArgs['ret_date'] ? \DateTime::createFromFormat('Y-m-d', $getSegmentsArgs['ret_date']) : null,
                     $getSegmentsArgs['search_option'],
                     $getSegmentsArgs['direct_search']
                 );
