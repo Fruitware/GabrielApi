@@ -8,6 +8,11 @@ interface SearchInterface
     const LANG_RO = 'ro';
     const LANG_EN = 'en';
 
+    const TYPE_ONE_WAY = 'oneway';
+    const TYPE_ROUND_TRIP = 'roundtrip';
+
+    const MAX_PASSENGERS_NUMBER = 9;
+
     /**
      * Set language ru|en|ro
      *
@@ -21,6 +26,25 @@ interface SearchInterface
      * @return string
      */
     public function getLang();
+
+    /**
+     * Set type
+     *
+     * @param string $type
+     *
+     * @return $this
+     */
+    public function setType($type);
+
+    /**
+     * @return string
+     */
+    public function getType();
+
+    /**
+     * @return array
+     */
+    static public function getTypes();
 
     /**
      * Set departure airport/city
@@ -147,4 +171,14 @@ interface SearchInterface
      * @return bool
      */
     public function getDirectSearch();
+
+    /**
+     * @return bool
+     */
+    public function hasAllowedNumberOfPassengers();
+
+    /**
+     * @return bool
+     */
+    public function hasAllowedNumberOfInfants();
 }

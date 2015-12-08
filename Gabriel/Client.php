@@ -270,6 +270,14 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
     {
         if ($this->logger) $this->logger->debug(__METHOD__.' called');
 
+        if (!$search->hasAllowedNumberOfPassengers()) {
+            throw new \RuntimeException(sprintf('The number of passengers must not exceed %d persons.', $search::MAX_PASSENGERS_NUMBER));
+        }
+
+        if (!$search->hasAllowedNumberOfInfants()) {
+            throw new \RuntimeException('Number of infants must not exceed the number of adults');
+        }
+
         $this->changeLanguage($search->getLang());
 
         $this->setNumberOfPassengers($search->getAdults(), $search->getChildren(), $search->getInfants());
@@ -311,7 +319,7 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
      *
      * @throws CacheExpiredException
      */
-    public function setNumberOfPassengers($adults, $children, $infants)
+    protected function setNumberOfPassengers($adults, $children, $infants)
     {
         $passengers = [
             'seats'    => (int)$adults + (int)$children,

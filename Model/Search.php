@@ -12,6 +12,11 @@ class Search implements SearchInterface
     /**
      * @var string
      */
+    protected $type = self::TYPE_ROUND_TRIP;
+
+    /**
+     * @var string
+     */
     protected $departureAirport;
 
     /**
@@ -55,9 +60,7 @@ class Search implements SearchInterface
     protected $directSearch = false;
 
     /**
-     * @param string $lang
-     *
-     * @return $this
+     * @inheritdoc
      */
     public function setLang($lang)
     {
@@ -67,7 +70,7 @@ class Search implements SearchInterface
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     public function getLang()
     {
@@ -75,9 +78,36 @@ class Search implements SearchInterface
     }
 
     /**
-     * @param string $departureAirport
-     *
-     * @return $this
+     * @inheritdoc
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    static public function getTypes()
+    {
+        return [
+            static::TYPE_ONE_WAY,
+            static::TYPE_ROUND_TRIP,
+        ];
+    }
+
+    /**
+     * @inheritdoc
      */
     public function setDepartureAirport($departureAirport)
     {
@@ -87,7 +117,7 @@ class Search implements SearchInterface
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     public function getDepartureAirport()
     {
@@ -95,9 +125,7 @@ class Search implements SearchInterface
     }
 
     /**
-     * @param string $arrivalAirport
-     *
-     * @return $this
+     * @inheritdoc
      */
     public function setArrivalAirport($arrivalAirport)
     {
@@ -107,7 +135,7 @@ class Search implements SearchInterface
     }
 
     /**
-     * @return string
+     * @inheritdoc
      */
     public function getArrivalAirport()
     {
@@ -115,9 +143,7 @@ class Search implements SearchInterface
     }
 
     /**
-     * @param \DateTime  $departureDate
-     *
-     * @return $this
+     * @inheritdoc
      */
     public function setDepartureDate(\DateTime $departureDate)
     {
@@ -127,7 +153,7 @@ class Search implements SearchInterface
     }
 
     /**
-     * @return \DateTime
+     * @inheritdoc
      */
     public function getDepartureDate()
     {
@@ -135,9 +161,7 @@ class Search implements SearchInterface
     }
 
     /**
-     * @param \DateTime $returnDate
-     *
-     * @return $this
+     * @inheritdoc
      */
     public function setReturnDate(\DateTime $returnDate = null)
     {
@@ -147,7 +171,7 @@ class Search implements SearchInterface
     }
 
     /**
-     * @return \DateTime
+     * @inheritdoc
      */
     public function getReturnDate()
     {
@@ -155,9 +179,7 @@ class Search implements SearchInterface
     }
 
     /**
-     * @param int $adults
-     *
-     * @return $this
+     * @inheritdoc
      */
     public function setAdults($adults)
     {
@@ -167,7 +189,7 @@ class Search implements SearchInterface
     }
 
     /**
-     * @return int
+     * @inheritdoc
      */
     public function getAdults()
     {
@@ -175,9 +197,7 @@ class Search implements SearchInterface
     }
 
     /**
-     * @param int $children
-     *
-     * @return $this
+     * @inheritdoc
      */
     public function setChildren($children)
     {
@@ -187,7 +207,7 @@ class Search implements SearchInterface
     }
 
     /**
-     * @return int
+     * @inheritdoc
      */
     public function getChildren()
     {
@@ -195,9 +215,7 @@ class Search implements SearchInterface
     }
 
     /**
-     * @param int $infants
-     *
-     * @return $this
+     * @inheritdoc
      */
     public function setInfants($infants)
     {
@@ -207,7 +225,7 @@ class Search implements SearchInterface
     }
 
     /**
-     * @return int
+     * @inheritdoc
      */
     public function getInfants()
     {
@@ -215,9 +233,7 @@ class Search implements SearchInterface
     }
 
     /**
-     * @param int $searchOption
-     *
-     * @return $this
+     * @inheritdoc
      */
     public function setSearchOption($searchOption)
     {
@@ -227,7 +243,7 @@ class Search implements SearchInterface
     }
 
     /**
-     * @return int
+     * @inheritdoc
      */
     public function getSearchOption()
     {
@@ -235,9 +251,7 @@ class Search implements SearchInterface
     }
 
     /**
-     * @param bool $directSearch
-     *
-     * @return $this
+     * @inheritdoc
      */
     public function setDirectSearch($directSearch)
     {
@@ -247,10 +261,35 @@ class Search implements SearchInterface
     }
 
     /**
-     * @return int
+     * @inheritdoc
      */
     public function getDirectSearch()
     {
         return $this->directSearch;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasAllowedNumberOfPassengers()
+    {
+        $numberOfPassengers = $this->getAdults() + $this->getChildren();
+        if ($numberOfPassengers <= static::MAX_PASSENGERS_NUMBER) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasAllowedNumberOfInfants()
+    {
+        if ($this->getAdults() >= $this->getInfants()) {
+            return true;
+        }
+
+        return false;
     }
 }
