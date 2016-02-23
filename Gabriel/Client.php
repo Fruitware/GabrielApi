@@ -542,6 +542,10 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
         elseif ($response['code'] == FatalException::ERROR_SESSION_EXPIRED) {
             throw new CacheExpiredException($response['message']);
         }
+        // Nu este legătură cu sistemul de rezervări. Repetați comanda mai târziu - это проблема с их сервисом
+        elseif (stripos($response['message'], 'Repetați comanda mai târziu') !== false) {
+            throw new FatalException($response['message'], FatalException::ERROR_INVALID_OPERATION);
+        }
 
         throw new BadResponseException($response['message'], $response['code']);
     }
