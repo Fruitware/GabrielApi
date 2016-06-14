@@ -79,7 +79,7 @@ class Invoice implements InvoiceInterface
      */
     public function getCurrencyCode()
     {
-        return (float)$this->get('InvoiceCurrencyCode');
+        return $this->get('InvoiceCurrencyCode');
     }
 
     /**

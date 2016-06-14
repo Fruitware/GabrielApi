@@ -72,6 +72,8 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
     }
 
     /**
+     * Get invoice details
+     *
      * @param string $invoiceNumber
      *
      * @return Invoice
@@ -86,6 +88,8 @@ class Client extends \GuzzleHttp\Command\Guzzle\GuzzleClient
     }
 
     /**
+     * Confirm invoice payment
+     *
      * @param string  $invoiceNumber
      * @param integer $paymentTypeCode
      * @param string  $transactionNumber
